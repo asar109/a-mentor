@@ -4,8 +4,8 @@ import SidebarRoutes from './SidebarRoutes'
 
 function Sidebar() {
   return (
-    <div className='bg-white h-full border-r flex flex-col overflow-y-auto shadow-sm'>
-      <div className="p-6">
+    <div className='bg-white h-full flex flex-col overflow-y-auto shadow-sm'>
+      <div>
         <Logo/>
         <div className="flex flex-col w-full">
           <SidebarRoutes/>

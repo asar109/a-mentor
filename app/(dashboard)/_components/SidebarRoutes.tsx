@@ -1,12 +1,15 @@
-'use client';
+"use client";
 
-import React from "react";
-import { Layout, Compass, LucideIcon } from "lucide-react";
+import { Compass, Layout, LucideIcon } from "lucide-react";
+import SidebarItem from "./SidebarItem";
 
+interface GuestRouteType {
+  label: string;
+  path: string;
+  icon: LucideIcon;
+}
 
-
-
-const guestRoutes = [
+const guestRoutes: GuestRouteType[] = [
   {
     label: "Home",
     path: "/",
@@ -19,20 +22,19 @@ const guestRoutes = [
   },
 ];
 
-
-
 function SidebarRoutes() {
-
   const routes = guestRoutes;
 
   return (
-    <div className="flex mt-4 flex-col h-full">
+    <div className="flex flex-col h-full">
       {routes.map((route) => {
         return (
-          <div key={route.path}>
-            <h1>Hello</h1>
-
-          </div>
+          <SidebarItem
+            key={route.path}
+            icon={route.icon}
+            label={route.label}
+            path={route.path}
+          />
         );
       })}
     </div>
