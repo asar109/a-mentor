@@ -1,15 +1,16 @@
 "use client";
 
-import { Compass, Layout, LucideIcon } from "lucide-react";
+import { BarChart, Compass, Layout, List, LucideIcon } from "lucide-react";
 import SidebarItem from "./SidebarItem";
+import { usePathname } from "next/navigation";
 
-interface GuestRouteType {
+interface RouteType {
   label: string;
   path: string;
   icon: LucideIcon;
 }
 
-const guestRoutes: GuestRouteType[] = [
+const guestRoutes: RouteType[] = [
   {
     label: "Home",
     path: "/",
@@ -22,8 +23,26 @@ const guestRoutes: GuestRouteType[] = [
   },
 ];
 
+const teacherRoutes: RouteType[] = [
+  {
+    icon: List,
+    label: "Courses",
+    path: "/teacher/courses",
+  },
+  {
+    icon: BarChart,
+    label: "Analytics",
+    path: "/teacher/analytics",
+  },
+];
+
 function SidebarRoutes() {
-  const routes = guestRoutes;
+
+  const pathname= usePathname();
+
+  const isTeacher = pathname.includes("/teacher");
+
+  const routes = isTeacher ? teacherRoutes : guestRoutes;
 
   return (
     <div className="flex flex-col h-full">
