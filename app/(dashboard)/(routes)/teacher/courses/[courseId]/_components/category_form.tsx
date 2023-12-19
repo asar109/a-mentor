@@ -17,42 +17,51 @@ import {
 } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
+import { Course } from "@prisma/client";
+import { Combobox } from "@/components/ui/combobox";
 
 const schema = z.object({
-  title: z
-    .string()
-    .min(3, { message: "Title must be at least 3 characters long" }),
+  categoryId: z.string().min(3),
 });
 
-interface TitleFormProps {
-  intialData: { title: string };
+interface CategoryFormProps {
+  intialData: Course;
   courseId: string;
+  options : {label : string , value : string}[]
 }
 
-export function TitleForm({ intialData, courseId }: TitleFormProps) {
+export function CategoryForm({
+  intialData,
+  courseId,
+  options
+}: CategoryFormProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const toggleEditing = () => setIsEditing(!isEditing);
 
+  const slectedOption = options.find(option => option.value === intialData.categoryId)
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: intialData,
+    defaultValues: {
+      categoryId: intialData?.categoryId || "",
+    },
   });
 
   const { isSubmitting, isValid } = form.formState;
 
-  const router = useRouter()
+  const router = useRouter();
   const submitHandler = async (values: z.infer<typeof schema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course title updated");
+      toast.success("Course category updated");
       toggleEditing();
-      router.refresh()
-
-      
+      router.refresh();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Something went wrong");
     }
   };
@@ -61,13 +70,13 @@ export function TitleForm({ intialData, courseId }: TitleFormProps) {
     <>
       <div className="p-4 mt-4 bg-slate-100 border  rounded-md">
         <div className="flex justify-between items-center">
-          <h1 className="text-base ">Course Title</h1>
+          <h1 className="text-base ">Course category</h1>
           <Button onClick={toggleEditing} variant={"ghost"}>
             {isEditing ? (
               "Cancel"
             ) : (
               <div className="flex justify-center items-center gap-x-2">
-                <Pencil size={16} /> <span>Edit Title </span>
+                <Pencil size={16} /> <span>Edit category </span>
               </div>
             )}
           </Button>
@@ -75,23 +84,29 @@ export function TitleForm({ intialData, courseId }: TitleFormProps) {
 
         <div>
           {!isEditing ? (
-            <h2 className="text-sm text-slate-600 mt-2">{intialData.title}</h2>
+            <h2
+              className={cn(
+                "text-sm  text-slate-500 mt-2",
+                !intialData.categoryId && "italic"
+              )}
+            >
+              {slectedOption?.label || "No category"}
+            </h2>
           ) : (
             <div className="mt-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(submitHandler)}>
                   <FormField
                     control={form.control}
-                    name="title"
+                    name="categoryId"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input
-                            {...field}
-                            disabled={isSubmitting}
-
-                            placeholder="e.g. 'Advance web development' "
-                          />
+                        <Combobox 
+                        options={options}
+                        {...field}
+                       
+                        />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

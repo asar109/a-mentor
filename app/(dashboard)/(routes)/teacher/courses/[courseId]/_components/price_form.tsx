@@ -18,26 +18,27 @@ import {
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Course } from "@prisma/client";
+import { formatePrice } from "@/lib/formatePrice";
 
 const schema = z.object({
-  title: z
-    .string()
-    .min(3, { message: "Title must be at least 3 characters long" }),
+  price: z.coerce.number()
 });
 
-interface TitleFormProps {
-  intialData: { title: string };
+interface PriceFormProps {
+  intialData: Course;
   courseId: string;
 }
 
-export function TitleForm({ intialData, courseId }: TitleFormProps) {
+export function PriceForm({ intialData, courseId }: PriceFormProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const toggleEditing = () => setIsEditing(!isEditing);
-
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: intialData,
+    defaultValues: {
+      price: intialData?.price || undefined,
+    },
   });
 
   const { isSubmitting, isValid } = form.formState;
@@ -46,7 +47,7 @@ export function TitleForm({ intialData, courseId }: TitleFormProps) {
   const submitHandler = async (values: z.infer<typeof schema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course title updated");
+      toast.success("Course Price updated");
       toggleEditing();
       router.refresh()
 
@@ -61,13 +62,13 @@ export function TitleForm({ intialData, courseId }: TitleFormProps) {
     <>
       <div className="p-4 mt-4 bg-slate-100 border  rounded-md">
         <div className="flex justify-between items-center">
-          <h1 className="text-base ">Course Title</h1>
+          <h1 className="text-base ">Course price</h1>
           <Button onClick={toggleEditing} variant={"ghost"}>
             {isEditing ? (
               "Cancel"
             ) : (
               <div className="flex justify-center items-center gap-x-2">
-                <Pencil size={16} /> <span>Edit Title </span>
+                <Pencil size={16} /> <span>Edit price </span>
               </div>
             )}
           </Button>
@@ -75,22 +76,24 @@ export function TitleForm({ intialData, courseId }: TitleFormProps) {
 
         <div>
           {!isEditing ? (
-            <h2 className="text-sm text-slate-600 mt-2">{intialData.title}</h2>
+            <h2 className="text-sm text-slate-600 mt-2">{intialData.price ? formatePrice(intialData.price) : "No Price"}</h2>
           ) : (
             <div className="mt-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(submitHandler)}>
                   <FormField
                     control={form.control}
-                    name="title"
+                    name="price"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
                           <Input
                             {...field}
                             disabled={isSubmitting}
-
-                            placeholder="e.g. 'Advance web development' "
+                            step="0.01"
+                            type="number"
+                             
+                            placeholder="Price"
                           />
                         </FormControl>
                         <FormMessage />

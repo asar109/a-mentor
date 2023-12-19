@@ -40,8 +40,6 @@ const page = () => {
   const handelSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.post("/api/courses", data);
-      console.log(response);
-
       router.push(`/teacher/courses/${response.data.id}`);
       toast.success("Course created successfully");
     } catch (error) {
