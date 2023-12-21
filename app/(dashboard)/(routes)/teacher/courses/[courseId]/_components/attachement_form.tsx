@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Attachment, Course } from "@prisma/client";
 import axios from "axios";
-import { ImageIcon, Pencil, Plus } from "lucide-react";
+import { File, ImageIcon, Loader2, Pencil, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -16,15 +16,15 @@ const schema = z.object({
 });
 
 interface AttachmentFormProps {
-  intialData: Course & {attachment : Attachment[]};
+  intialData: Course & { attachment: Attachment[] };
   courseId: string;
 }
 
 export function AttachmentForm({ intialData, courseId }: AttachmentFormProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [deleteId , setDeleteId] = useState<string | null>(null);
 
   const toggleEditing = () => setIsEditing(!isEditing);
-
 
   const router = useRouter();
   const submitHandler = async (values: z.infer<typeof schema>) => {
@@ -38,6 +38,23 @@ export function AttachmentForm({ intialData, courseId }: AttachmentFormProps) {
       toast.error("Something went wrong");
     }
   };
+
+
+  const deleteHandler = async (id : string)=> {
+    try {
+      setDeleteId(id);
+      await axios.delete(`/api/courses/${courseId}/attachments/${id}`);
+      toast.success("Attachment deleted");
+      router.refresh();
+      setDeleteId(null);
+    } catch (error) {
+      setDeleteId(null);
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  }
+
+
 
   return (
     <>
@@ -71,18 +88,51 @@ export function AttachmentForm({ intialData, courseId }: AttachmentFormProps) {
                 !intialData.attachment && "italic"
               )}
             >
-              {
-                intialData.attachment.length === 0 ? "No attachment added" : intialData.attachment[0].name
-              }
+              {intialData.attachment.length === 0 ? (
+                "No attachment added"
+              ) : (
+                <>
+                  <div className="bg-sky-200 p-2">
+                    {intialData.attachment.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="flex items-center mb-1 gap-x-2"
+                      >
+                        <File className="h-4 w-4" />
+                        <a
+                          href={attachment.url}
+                          className="text-sm line-clamp-1 text-sky-700 hover:underline "
+                        >
+                          {attachment.name}
+                        </a>
+                        {
+                          deleteId === attachment.id ? (<>
+                          
+                          <Loader2 className="h-4 w-4  animate-spin " />
+                          
+                          </>): (<>
+                          
+                           <button onClick={()=>deleteHandler(attachment.id)} >
+                           <div className="ml-auto m-1 ">
+                        <X className="w-4 h-4 hover:cursor-pointer" />
+                        </div>
+                           </button>
+                          </>)
+                        }
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </h2>
           ) : (
             <>
-              <div className="h-64 ">
+              <div className="h-64  ">
                 <FileUpload
                   endpoint="courseAttachment"
                   onChange={(url) => {
                     if (url) {
-                      submitHandler( {  url : url });
+                      submitHandler({ url });
                     }
                   }}
                 />

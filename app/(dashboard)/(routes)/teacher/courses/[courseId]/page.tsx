@@ -1,7 +1,12 @@
 import { IconBadge } from "@/components/icon_badge";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
-import { LayoutDashboard, ListChecks, CircleDollarSign, File } from "lucide-react";
+import {
+  LayoutDashboard,
+  ListChecks,
+  CircleDollarSign,
+  File,
+} from "lucide-react";
 import { redirect } from "next/navigation";
 import React from "react";
 import { TitleForm } from "./_components/title_form";
@@ -26,13 +31,13 @@ const page = async ({ params }: { params: ParamsType }) => {
     where: {
       id: params.courseId,
     },
-    include : {
-      attachment : {
-        orderBy : {
-          createdAt : "desc"
-        }
-      }
-    }
+    include: {
+      attachment: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
   });
 
   const categories = await db.category.findMany({
@@ -107,7 +112,6 @@ const page = async ({ params }: { params: ParamsType }) => {
               <h2 className="text-xl">Resources & attachments</h2>
             </div>
             <AttachmentForm intialData={course} courseId={params.courseId} />
-            
           </div>
         </div>
       </div>
