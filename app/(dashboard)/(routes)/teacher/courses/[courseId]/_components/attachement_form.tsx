@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Attachment, Course } from "@prisma/client";
 import axios from "axios";
-import { File, ImageIcon, Loader2, Pencil, Plus, X } from "lucide-react";
+import { File, ImageIcon, Loader2, Pencil, PlusCircle, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -68,8 +68,8 @@ export function AttachmentForm({ intialData, courseId }: AttachmentFormProps) {
               <div className="flex justify-center items-center gap-x-2">
                 {
                   <>
-                    <Plus
-                      className="h-4 w-4 rounded-full border border-black"
+                    <PlusCircle
+                      className="h-4 w-4"
                       size={16}
                     />{" "}
                     Add a file

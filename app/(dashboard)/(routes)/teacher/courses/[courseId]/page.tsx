@@ -15,6 +15,7 @@ import { ImageForm } from "./_components/image_form";
 import { CategoryForm } from "./_components/category_form";
 import { PriceForm } from "./_components/price_form";
 import { AttachmentForm } from "./_components/attachement_form";
+import { ChaptersForm } from "./_components/chapters_form";
 
 interface ParamsType {
   courseId: string;
@@ -30,8 +31,14 @@ const page = async ({ params }: { params: ParamsType }) => {
   const course = await db.course.findUnique({
     where: {
       id: params.courseId,
+      userId,
     },
     include: {
+      chapters: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
       attachment: {
         orderBy: {
           createdAt: "desc",
@@ -56,6 +63,7 @@ const page = async ({ params }: { params: ParamsType }) => {
     course.imageUrl,
     course.price,
     course.categoryId,
+    course.chapters.some((chapter)=> chapter.isPublished)
   ];
 
   const totalFields = requiredFields.length;
@@ -77,7 +85,7 @@ const page = async ({ params }: { params: ParamsType }) => {
         <div>
           <div className="flex items-center gap-x-2">
             <IconBadge icon={LayoutDashboard} />
-            <h2 className="text-xl">Customize your course</h2>
+            <h2 className="text-lg font-semibold">Customize your course</h2>
           </div>
           <TitleForm intialData={course} courseId={params.courseId} />
           <DescriptionForm intialData={course} courseId={params.courseId} />
@@ -94,22 +102,22 @@ const page = async ({ params }: { params: ParamsType }) => {
         <div>
           <div className="flex items-center gap-x-2">
             <IconBadge icon={ListChecks} />
-            <h2 className="text-xl">Course Chapters</h2>
+            <h2 className="text-lg font-semibold">Course Chapters</h2>
           </div>
           <div>
-            <h1>Todo : chapters</h1>
+          <ChaptersForm intialData={course} courseId={params.courseId} />
           </div>
           <div className="mt-2">
             <div className="flex items-center gap-x-2">
               <IconBadge icon={CircleDollarSign} />
-              <h2 className="text-xl">Course Price</h2>
+              <h2 className="text-lg font-semibold">Course Price</h2>
             </div>
             <PriceForm intialData={course} courseId={params.courseId} />
           </div>
           <div className="mt-2">
             <div className="flex items-center gap-x-2">
               <IconBadge icon={File} />
-              <h2 className="text-xl">Resources & attachments</h2>
+              <h2 className="text-lg font-semibold">Resources & attachments</h2>
             </div>
             <AttachmentForm intialData={course} courseId={params.courseId} />
           </div>

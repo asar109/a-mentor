@@ -57,6 +57,7 @@ model Chapter {
   description String? @db.Text
   isPublished Boolean @default(false)
   isFree Boolean @default(false)
+  position Int
   videoUrl String? @db.Text
   userProgress UserProgress[]
   courseId String
@@ -113,3 +114,6 @@ model StripeCustomer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+
